@@ -46,13 +46,25 @@ def add_new_user():
 @app.route('/members/<int:id>', methods=['DELETE'])
 def delete_user(id):
     jackson_family.delete_member(id)
-    return jsonify(jackson_family.get_all_members())
+    deleted_member = jackson_family.delete_member(id)
+    if deleted_member:
+        return jsonify(jackson_family.get_all_members()), 200
+    else:
+        return jsonify({"error": "Member not found"}), 404
 
 
 @app.route('/members/<int:id>', methods=['PATCH'])
 def update_user(id):
     request_data = request.json 
     updated_member = jackson_family.update_member(id, request_data) # Call the update_member method on the family structure to perform the update
+    
+    for key, value in request_data.items():  # Update only the specified keys
+        member = jackson_family.get_member(id)
+        if member[key] == value:
+            return jsonify(updated_member), 200
+        else:
+            return jsonify({"error": "Change could not be processed"}), 500              
+
     if updated_member:
         return jsonify(updated_member), 200
     else:
