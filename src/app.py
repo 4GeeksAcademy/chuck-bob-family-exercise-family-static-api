@@ -34,9 +34,31 @@ def handle_hello():
         "hello": "world",
         "family": members
     }
-
-
     return jsonify(response_body), 200
+    
+
+@app.route('/members', methods=['POST'])
+def add_new_user():
+    request_body = request.json
+    jackson_family.add_member(request_body)
+    return jsonify(jackson_family.get_all_members())
+
+@app.route('/members/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    jackson_family.delete_member(id)
+    return jsonify(jackson_family.get_all_members())
+
+@app.route('/members/<int:id>', methods=['PATCH'])
+def update_user(id):
+    request_data = request.json 
+    updated_member = jackson_family.update_member(id, request_data) # Call the update_member method on the family structure to perform the update
+
+    if updated_member:
+        return jsonify(updated_member), 200
+    else:
+        return jsonify({"error": "Member not found"}), 404
+
+    
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
