@@ -40,7 +40,7 @@ def handle_hello():
 def add_new_user():
     request_body = request.json
     jackson_family.add_member(request_body)
-    return jsonify(jackson_family.get_all_members())
+    return jsonify(jackson_family.get_all_members()), 200
 
 
 @app.route('/members/<int:id>', methods=['DELETE'])
@@ -54,18 +54,23 @@ def delete_user(id):
 
 
 
+@app.route('/members/<int:id>', methods=['PUT'])
+def replace_user(id):
+    request_data = request.json                                                 # Get JSON data with updates
+    replace_member = jackson_family.update_member(id, request_data)             # Attempt to replace member
+    return jsonify(replace_member), 200                                         # Return updated member details
+
+
 @app.route('/members/<int:id>', methods=['PATCH'])
 def update_user(id):
     request_data = request.json                                                 # Get JSON data with updates
     updated_member = jackson_family.update_member(id, request_data)             # Attempt to update member attributes
-
     for key, value in request_data.items():                                     # VALIDATION: Loop through specified keys to update
         member = jackson_family.get_member(id)                                  # Get the current member data
         if member[key] == value:                                                # Check if the update was successful
             return jsonify(updated_member), 200                                 # Return updated member if successful
         else:
             return jsonify({"error": "Change could not be processed"}), 500     # Return error if update failed
-
     if updated_member:
         return jsonify(updated_member), 200                                     # VALIDATION: Return updated member if found and modified
     else:
