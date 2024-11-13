@@ -45,30 +45,32 @@ def add_new_user():
 
 @app.route('/members/<int:id>', methods=['DELETE'])
 def delete_user(id):
-    jackson_family.delete_member(id)
-    deleted_member = jackson_family.delete_member(id)
-    if deleted_member:
-        return jsonify(jackson_family.get_all_members()), 200
+    jackson_family.delete_member(id)                            # Attempt to delete member with given id
+    deleted_member = jackson_family.delete_member(id)           # Store result of deletion
+    if deleted_member:                                          #VALIDATION: if delete_member() returns true
+        return jsonify(jackson_family.get_all_members()), 200   # Return updated list if deletion is successful
     else:
-        return jsonify({"error": "Member not found"}), 404
+        return jsonify({"error": "Member not found"}), 404      # Return error if member is not found
+
 
 
 @app.route('/members/<int:id>', methods=['PATCH'])
 def update_user(id):
-    request_data = request.json 
-    updated_member = jackson_family.update_member(id, request_data) # Call the update_member method on the family structure to perform the update
-    
-    for key, value in request_data.items():  # Update only the specified keys
-        member = jackson_family.get_member(id)
-        if member[key] == value:
-            return jsonify(updated_member), 200
+    request_data = request.json                                                 # Get JSON data with updates
+    updated_member = jackson_family.update_member(id, request_data)             # Attempt to update member attributes
+
+    for key, value in request_data.items():                                     # VALIDATION: Loop through specified keys to update
+        member = jackson_family.get_member(id)                                  # Get the current member data
+        if member[key] == value:                                                # Check if the update was successful
+            return jsonify(updated_member), 200                                 # Return updated member if successful
         else:
-            return jsonify({"error": "Change could not be processed"}), 500              
+            return jsonify({"error": "Change could not be processed"}), 500     # Return error if update failed
 
     if updated_member:
-        return jsonify(updated_member), 200
+        return jsonify(updated_member), 200                                     # VALIDATION: Return updated member if found and modified
     else:
-        return jsonify({"error": "Member not found"}), 404
+        return jsonify({"error": "Member not found"}), 404                      # Return error if member is not found
+
 
     
 

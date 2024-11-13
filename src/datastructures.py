@@ -31,7 +31,7 @@ class FamilyStructure:
                     member[key] = value             # Replace the key value with the new key value
                 return member                       # Return the updated member data
         return None                                 # If member with the given id is not found
-
+        
 
     def delete_member(self, id):
         for index, member in enumerate(self._members):  # Loop through members with index
